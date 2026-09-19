@@ -1,4 +1,4 @@
-import { getLocalStorage, setLocalStorage } from "./utils.mjs";
+import { getLocalStorage, setLocalStorage, updateCartCount } from "./utils.mjs";
 
 function removeFromCart(itemId) {
   const cartItems = getLocalStorage("so-cart") || [];
@@ -21,8 +21,9 @@ function renderCartContents() {
       removeFromCart(event.currentTarget.dataset.id);
     });
   });
-}
 
+  updateCartCount();
+}
 function cartItemTemplate(item) {
   const newItem = `<li class="cart-card divider">
   <button class="cart-card__remove" data-id="${item.Id}" aria-label="Remove ${item.Name} from cart">X</button>

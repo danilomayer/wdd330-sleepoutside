@@ -38,3 +38,12 @@ export function renderListWithTemplate(template, parentElement, list, position =
   }
   parentElement.insertAdjacentHTML(position, htmlStrings.join(""));
 }
+
+// update the cart count badge in the header
+export function updateCartCount() {
+  const cartItems = getLocalStorage("so-cart") || [];
+  const badge = qs("#cart-count");
+  if (badge) {
+    badge.textContent = cartItems.length > 0 ? cartItems.length : "";
+  }
+}
