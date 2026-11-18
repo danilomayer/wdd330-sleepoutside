@@ -1,5 +1,6 @@
-import { getLocalStorage, setLocalStorage } from "./utils.mjs";
-import { loadHeaderFooter } from "./utils.mjs";
+import { getLocalStorage, setLocalStorage, loadHeaderFooter } from "./utils.mjs";
+
+loadHeaderFooter();
 
 function removeFromCart(itemId) {
   const cartItems = getLocalStorage("so-cart") || [];
@@ -29,14 +30,14 @@ function cartItemTemplate(item) {
   <button class="cart-card__remove" data-id="${item.Id}" aria-label="Remove ${item.Name} from cart">X</button>
   <a href="#" class="cart-card__image">
     <img
-      src="${item.Image}"
+      src="${item.Images?.PrimaryMedium ?? item.Image}"
       alt="${item.Name}"
     />
   </a>
   <a href="#">
     <h2 class="card__name">${item.Name}</h2>
   </a>
-  <p class="cart-card__color">${item.Colors[0].ColorName}</p>
+  <p class="cart-card__color">${item.Colors?.[0]?.ColorName ?? ""}</p>
   <p class="cart-card__quantity">qty: 1</p>
   <p class="cart-card__price">$${item.FinalPrice}</p>
 </li>`;
@@ -45,5 +46,3 @@ function cartItemTemplate(item) {
 }
 
 renderCartContents();
-
-loadHeaderFooter();
