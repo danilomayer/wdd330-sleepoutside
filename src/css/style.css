@@ -343,8 +343,6 @@ footer {
 
 /* Append to the end of src/css/style.css */
 
-/* Append to the end of src/css/style.css */
-
 .hide {
   display: none;
 }
@@ -443,7 +441,7 @@ footer {
   height: 1.8rem;
   border: 1px solid #999;
   border-radius: 4px;
-  background: #fff;
+  background: var(--tertiary-color);
   font-size: 1rem;
   line-height: 1;
   cursor: pointer;
