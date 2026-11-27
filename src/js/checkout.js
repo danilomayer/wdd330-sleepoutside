@@ -22,7 +22,7 @@ form.addEventListener("submit", async (event) => {
         return;
     }
 
-    if (order.list.length === 0) {
+    if (order.itemCount === 0) {
         alertMessage("Your cart is empty.");
         return;
     }

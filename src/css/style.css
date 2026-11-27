@@ -343,6 +343,8 @@ footer {
 
 /* Append to the end of src/css/style.css */
 
+/* Append to the end of src/css/style.css */
+
 .hide {
   display: none;
 }
@@ -428,4 +430,31 @@ footer {
   cursor: pointer;
   font-weight: bold;
   padding-left: 1rem;
+}
+
+.cart-card__quantity {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.qty-btn {
+  width: 1.8rem;
+  height: 1.8rem;
+  border: 1px solid #999;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qty-value {
+  min-width: 1.5rem;
+  text-align: center;
 }
