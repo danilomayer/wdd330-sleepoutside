@@ -1,4 +1,4 @@
-import { getLocalStorage } from "./utils.mjs";
+import { getLocalStorage, alertMessage } from "./utils.mjs";
 import ExternalServices from "./ExternalServices.mjs";
 
 const services = new ExternalServices();
@@ -17,19 +17,19 @@ function formDataToJSON(formElement) {
 
 // takes the items currently stored in the cart (localStorage) and returns them
 // in the simplified form the server expects. The cart stores one entry per
-// click, so repeated products are merged into one line with a quantity.
+// click (older carts) or one with a quantity, so both are merged by id.
 function packageItems(items) {
     const merged = new Map();
 
     items.forEach((item) => {
         if (merged.has(item.Id)) {
-            merged.get(item.Id).quantity += 1;
+            merged.get(item.Id).quantity += item.quantity || 1;
         } else {
             merged.set(item.Id, {
                 id: item.Id,
                 name: item.Name,
                 price: item.FinalPrice,
-                quantity: 1,
+                quantity: item.quantity || 1,
             });
         }
     });
@@ -53,12 +53,18 @@ export default class CheckoutProcess {
         this.calculateItemSubTotal();
     }
 
+    get itemCount() {
+        return this.list.reduce((n, item) => n + (item.quantity || 1), 0);
+    }
+
     calculateItemSubTotal() {
-        // every cart entry is one unit, so the item count is the list length
-        this.itemTotal = this.list.reduce((sum, item) => sum + item.FinalPrice, 0);
+        this.itemTotal = this.list.reduce(
+            (sum, item) => sum + item.FinalPrice * (item.quantity || 1),
+            0,
+        );
 
         const summary = document.querySelector(this.outputSelector);
-        summary.querySelector("#num-items").innerText = this.list.length;
+        summary.querySelector("#num-items").innerText = this.itemCount;
         summary.querySelector("#subtotal").innerText = `$${this.itemTotal.toFixed(2)}`;
     }
 
@@ -67,7 +73,7 @@ export default class CheckoutProcess {
         this.tax = this.itemTotal * 0.06;
 
         // $10 for the first item plus $2 for each additional item
-        const count = this.list.length;
+        const count = this.itemCount;
         this.shipping = count > 0 ? 10 + (count - 1) * 2 : 0;
 
         this.orderTotal = this.itemTotal + this.tax + this.shipping;
@@ -93,6 +99,29 @@ export default class CheckoutProcess {
         order.shipping = this.shipping;
         order.items = packageItems(this.list);
 
-        return services.checkout(order);
+        try {
+            const response = await services.checkout(order);
+            console.log(response);
+
+            // happy path: empty the cart and go to the success page
+            localStorage.removeItem(this.key);
+            window.location.assign("success.html");
+        } catch (err) {
+            // unhappy path: stay on the form so nothing the user typed is lost
+            console.log(err);
+            const body = err.message;
+            let messages;
+            if (typeof body === "string") {
+                messages = [body];
+            } else if (body && typeof body === "object") {
+                // the server may send {message: "..."} or an object of messages
+                messages = Object.values(body).map((v) =>
+                    typeof v === "string" ? v : JSON.stringify(v),
+                );
+            } else {
+                messages = ["Something went wrong placing your order."];
+            }
+            messages.forEach((msg) => alertMessage(msg));
+        }
     }
 }

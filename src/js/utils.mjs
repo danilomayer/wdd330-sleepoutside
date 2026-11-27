@@ -76,3 +76,34 @@ export async function loadHeaderFooter() {
     renderWithTemplate(footerTemplate, footerElement);
   }
 }
+
+// show a dismissible alert at the top of <main>
+export function alertMessage(message, scroll = true) {
+  const main = document.querySelector("main");
+
+  const alert = document.createElement("div");
+  alert.classList.add("alert");
+
+  const text = document.createElement("p");
+  text.textContent = message;
+
+  const close = document.createElement("span");
+  close.classList.add("alert__close");
+  close.textContent = "X";
+  close.setAttribute("role", "button");
+  close.setAttribute("aria-label", "Dismiss message");
+
+  alert.append(text, close);
+
+  // only the X removes the alert
+  alert.addEventListener("click", function (e) {
+    if (e.target.tagName === "SPAN") {
+      main.removeChild(this);
+    }
+  });
+
+  main.prepend(alert);
+
+  // make sure the user sees it, but let callers turn this off
+  if (scroll) window.scrollTo(0, 0);
+}
